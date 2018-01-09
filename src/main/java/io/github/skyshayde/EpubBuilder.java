@@ -15,10 +15,18 @@ import java.util.List;
 public class EpubBuilder {
     private final Blog blog;
     private final Book book = new Book();
+    private String epubName = null;
 
     public EpubBuilder(WordpressScraper b) {
         b.scrape();
         this.blog = b.blog;
+        this.epubName = blog.getTitle() + " - " + blog.getAuthor() + ".epub";
+    }
+
+    public EpubBuilder(WordpressScraper b, String fileName) {
+        b.scrape();
+        this.blog = b.blog;
+        this.epubName = fileName.replace("${author}", blog.getAuthor()).replace("${title}", blog.getTitle());
     }
 
     public void build() {
@@ -33,7 +41,7 @@ public class EpubBuilder {
         blog.getPosts().forEach(i -> book.addSection(i.title, new Resource(i.content.getBytes(), "chapters/" + i.title.replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".html")));
 //        buildInlineTOC(book);
         try {
-            new EpubWriter().write(book, new FileOutputStream(blog.getTitle() + " - " + blog.getAuthor() + ".epub"));
+            new EpubWriter().write(book, new FileOutputStream(this.epubName));
         } catch (IOException e) {
             e.printStackTrace();
         }
