@@ -36,50 +36,45 @@ public class WordpressScraper {
             System.out.println("Could not connect to " + url);
             return;
         }
-        doc.getElementsByTag("meta").forEach(i -> {
-            if (i.attr("property").equals("og:site_name")) {
-                try {
-                    blog.setTitle(i.attr("content"));
-                } catch (NullPointerException e) {
-                    blog.setTitle("Unknown");
-                }
-            }
-            //wip this author parsing bit
-        });
+        try {
+            blog.setTitle(doc.selectFirst("meta[property=og:site_name]").attr("content"));
+        } catch (NullPointerException e) {
+            blog.setTitle("Unknown");
+        }
         try {
             blog.setAuthor(doc.selectFirst("span.author").text());
         } catch (NullPointerException e) {
             blog.setAuthor("Unknown");
         }
-        doc.getElementsByTag("link").forEach(i -> {
-            if (i.attr("rel").equals("next")) {
-                try {
-                    fetchChapter(Jsoup.connect(i.attr("href")).get());
-                } catch (IOException e) {
-                    System.out.println("No more pages.  ");
-                }
+        fetchChapter(doc);
+        String nextURL = doc.selectFirst("link[rel=next]").attr("href");
+        while (true) {
+            if (nextURL == null) {
+                break;
             }
-        });
+            try {
+                nextURL = fetchChapter(Jsoup.connect(nextURL).get());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    private void fetchChapter(Document doc) {
-        Document docClone = doc.clone();
-        Element title = doc.select("h1.entry-title").first();
+    private String fetchChapter(Document doc) {
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Element title = doc.selectFirst("h1.entry-title");
         System.out.println(title.text());
-        docClone.select("div.wpcnt").remove();
-        docClone.select("div.sharedaddy").remove();
-        docClone.select("div#jp-post-flair").remove();
-        String content = title.outerHtml() + docClone.select("div.entry-content").first().outerHtml();
-        blog.addPost(new Post(title.text(), content));
-        doc.getElementsByTag("link").forEach(i -> {
-            if (i.attr("rel").equals("next")) {
-                try {
-                    fetchChapter(Jsoup.connect(i.attr("href")).get());
-                } catch (IOException e) {
-                    System.out.println("No more pages.  ");
-                }
-            }
-        });
+        doc.select("div.wpcnt").remove();
+        doc.select("div.sharedaddy").remove();
+        doc.select("div#jp-post-flair").remove();
+        String chapterContent = title.outerHtml() + doc.select("div.entry-content").first().outerHtml();
+        blog.addPost(new Post(title.text(), chapterContent));
+        return doc.selectFirst("link[rel=next]").attr("href");
     }
 
 
