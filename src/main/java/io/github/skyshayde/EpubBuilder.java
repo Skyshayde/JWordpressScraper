@@ -28,16 +28,16 @@ public class EpubBuilder {
         metadata.addTitle(blog.getTitle());
         metadata.addAuthor(new Author(blog.getAuthor()));
 
-        String titleHTML = "<h1>" + blog.getTitle() + "</h1>";
+        String titleHTML = "<h1 style=\"text-align:center\">" + blog.getTitle() + "</h1>";
 
         book.addSection("Title", new Resource(titleHTML.getBytes(), "title.html"));
 
         blog.getPosts().forEach(i -> {
             book.addSection(i.title, new Resource(i.content.getBytes(), "chapters/" + i.title.replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".html"));
         });
-        buildInlineTOC(book);
+//        buildInlineTOC(book);
         try {
-            new EpubWriter().write(book, new FileOutputStream("test.epub"));
+            new EpubWriter().write(book, new FileOutputStream(blog.getTitle() + " - " + blog.getAuthor() + ".epub"));
         } catch (IOException e) {
             e.printStackTrace();
         }

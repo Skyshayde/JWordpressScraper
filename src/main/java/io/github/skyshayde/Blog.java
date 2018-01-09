@@ -9,7 +9,7 @@ public class Blog {
     private String author = null;
     private String title = null;
 
-    public void addPost(Post p){
+    public void addPost(Post p) {
         posts.add(p);
     }
 
@@ -18,15 +18,26 @@ public class Blog {
     }
 
     public String getAuthor() {
-        if(author == null) {
+        if (author == null) {
             return "Unknown";
         }
         return this.author;
     }
+
+    public void setAuthor(String in) {
+        this.author = in.substring(0, 1).toUpperCase() + in.substring(1);
+        ;
+    }
+
     public String getTitle() {
-        if(title == null) {
+        if (title == null) {
             return "Unknown";
         }
         return this.title;
     }
+
+    public void setTitle(String in) {
+        this.title = in;
+    }
+
 }

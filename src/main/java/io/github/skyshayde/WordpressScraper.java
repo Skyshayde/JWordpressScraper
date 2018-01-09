@@ -55,15 +55,18 @@ public class WordpressScraper {
         doc.getElementsByTag("meta").forEach(i -> {
             if (i.attr("property").equals("og:site_name")) {
                 try {
-                    meta.put("title", i.text());
+                    blog.setTitle(i.attr("content"));
                 } catch (NullPointerException e) {
-                    meta.put("title", "Unknown");
+                    blog.setTitle("Unknown");
                 }
             }
             //wip this author parsing bit
-            if (i.attr("property").equals("author")) {
-            }
         });
+        try {
+            blog.setAuthor(doc.selectFirst("span.author").text());
+        } catch (NullPointerException e) {
+            blog.setAuthor("Unknown");
+        }
         doc.getElementsByTag("link").forEach(i -> {
             if (i.attr("rel").equals("next")) {
                 try {
