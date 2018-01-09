@@ -1,9 +1,9 @@
 package io.github.skyshayde;
 
-public class Post {
+class Post {
 
-    String title;
-    String content;
+    final String title;
+    final String content;
 
     public Post(String iTitle, String iContent) {
         this.title = iTitle;

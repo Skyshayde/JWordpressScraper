@@ -3,9 +3,9 @@ package io.github.skyshayde;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Blog {
+class Blog {
 
-    private List<Post> posts = new ArrayList<Post>();
+    private final List<Post> posts = new ArrayList<>();
     private String author = null;
     private String title = null;
 
@@ -26,7 +26,6 @@ public class Blog {
 
     public void setAuthor(String in) {
         this.author = in.substring(0, 1).toUpperCase() + in.substring(1);
-        ;
     }
 
     public String getTitle() {

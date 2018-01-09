@@ -4,32 +4,16 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import nl.siegmann.epublib.domain.Author;
-import nl.siegmann.epublib.domain.Book;
-import nl.siegmann.epublib.domain.Metadata;
-import nl.siegmann.epublib.domain.Resource;
-import nl.siegmann.epublib.epub.EpubWriter;
-import org.jsoup.select.Elements;
 
 /**
  * Created by skysh on 12/30/2017.
  */
 
 public class WordpressScraper {
-    String startingUrl;
-    int delay = 0;
-    Map<String, String> meta = new HashMap<String, String>();
-    List<List<String>> spine = new ArrayList<List<String>>();
-    Blog blog = new Blog();
+    private final String startingUrl;
+    private int delay = 0;
+    final Blog blog = new Blog();
 
     public WordpressScraper(String url) {
         this.startingUrl = url;
@@ -44,7 +28,7 @@ public class WordpressScraper {
         fetchMeta(this.startingUrl);
     }
 
-    public void fetchMeta(String url) {
+    private void fetchMeta(String url) {
         Document doc;
         try {
             doc = Jsoup.connect(url).get();
@@ -78,7 +62,7 @@ public class WordpressScraper {
         });
     }
 
-    public void fetchChapter(Document doc) {
+    private void fetchChapter(Document doc) {
         Document docClone = doc.clone();
         Element title = doc.select("h1.entry-title").first();
         System.out.println(title.text());

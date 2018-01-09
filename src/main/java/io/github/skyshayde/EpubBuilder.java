@@ -10,13 +10,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.util.List;
 
 public class EpubBuilder {
-    Blog blog;
-    Book book = new Book();
+    private final Blog blog;
+    private final Book book = new Book();
 
     public EpubBuilder(WordpressScraper b) {
         b.scrape();
@@ -32,9 +30,7 @@ public class EpubBuilder {
 
         book.addSection("Title", new Resource(titleHTML.getBytes(), "title.html"));
 
-        blog.getPosts().forEach(i -> {
-            book.addSection(i.title, new Resource(i.content.getBytes(), "chapters/" + i.title.replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".html"));
-        });
+        blog.getPosts().forEach(i -> book.addSection(i.title, new Resource(i.content.getBytes(), "chapters/" + i.title.replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".html")));
 //        buildInlineTOC(book);
         try {
             new EpubWriter().write(book, new FileOutputStream(blog.getTitle() + " - " + blog.getAuthor() + ".epub"));
