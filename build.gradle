@@ -2,6 +2,7 @@ group 'io.github.skyshayde'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'maven-publish'
 
 sourceCompatibility = 1.8
 
@@ -13,4 +14,59 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile 'com.positiondev.epublib:epublib-core:3.1'
     compile 'org.jsoup:jsoup:1.11.2'
+}
+task sourceJar(type: Jar, dependsOn: classes) {
+    classifier 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+                pom.withXml {
+                    asNode().with {
+                        appendNode('packaging', 'jar')
+                        appendNode('name', 'JWordpressScraper')
+                        appendNode('description', 'Scraper for wordpress blogs, built in Java Edit')
+                        appendNode('url', 'https://github.com/Skyshayde/JWordpressScraper')
+                        appendNode('issueManagement').with {
+                            appendNode('url', 'https://github.com/Skyshayde/JWordpressScraper/issues')
+                            appendNode('system', 'GitHub Issues')
+                        }
+                        appendNode('licenses').with {
+                            appendNode('license').with {
+                                appendNode('name', 'MIT')
+                                appendNode('url', 'https://raw.githubusercontent.com/Skyshayde/JWordpressScraper/master/LICENSE')
+                            }
+                        }
+                        appendNode('developers').with {
+                            appendNode('developer').with {
+                                appendNode('id', 'skyshayde')
+                                appendNode('name', 'Teddy Heinen')
+                                appendNode('email', 'skyshayde@gmail.com')
+                                appendNode('timezone', 'UTC-6')
+                            }
+                        }
+                    }
+                }
+                tasks.withType(Jar) {
+                    from(project.projectDir) {
+                        include 'LICENSE.md'
+                        into 'META-INF'
+                    }
+                }
+                artifact sourceJar
+                artifact javadocJar
+            }
+        }
+        repositories {
+            mavenLocal()
+        }
+
+
+    }
 }
