@@ -1,22 +1,21 @@
 # JWordpressScraper
+> Wordpress Scraping Library, built in Java
 
-JWordpressScraper is a scraper for wordpress blogs, built in Java.
-## Getting Started
+
+## Installing / Getting started
+
+```java
+WordpressScraper scraper = new WordpressScraper("URL of first post").scrape();
+// ${title} and ${author} will be replaced by the actual title and author of the blog.
+new EpubBuilder(scraper.blog, "${title} - ${author}");
 ```
-WordpressScraper scraper = new WordpressScraper("URL of first wordpress post");
-new EpubBuilder(scraper).build();
 
-new EpubBuilder(scraper, "${title}.epub").build();
 
-```
+## Features
 
-EPUB file will by default output into the working directory with a name of Title - Author.epub.  If you pass a string as the second parameter when creating the EpubBuilder object then it will use that as the name instead.  ${title} will be replaced by the title and ${author} will be replaced by the author name.
-
-## Authors
-
-* **Teddy Heinen** - *Primary Author* - [Skyshayde](https://github.com/Skyshayde)
-
-See also the list of [contributors](https://github.com/Skyshayde/JWordpressScraper/graphs/contributors) who participated in this project.
+* Scrape Wordpress Blog
+* Create Epub file from Wordpress blogs
+* Extract information from created epubs to allow for easy updating
 
 ## License
 
