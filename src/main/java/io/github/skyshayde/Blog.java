@@ -3,13 +3,23 @@ package io.github.skyshayde;
 import java.util.ArrayList;
 import java.util.List;
 
-class Blog {
+public class Blog {
+
 
     private final List<Post> posts = new ArrayList<>();
-    private String author = null;
-    private String title = null;
+    public String author = "Unknown";
+    public String title = "Unknown";
+    public String firstUrl = "";
+    public String prevUrl = "";
 
     public void addPost(Post p) {
+        posts.forEach(i -> {
+            // add underscore if the title is a duplicate and then call the function again
+            if (i.title == p.title) {
+                addPost(new Post(p.title + "_", p.content));
+                return;
+            }
+        });
         posts.add(p);
     }
 
@@ -18,9 +28,6 @@ class Blog {
     }
 
     public String getAuthor() {
-        if (author == null) {
-            return "Unknown";
-        }
         return this.author;
     }
 
@@ -29,9 +36,6 @@ class Blog {
     }
 
     public String getTitle() {
-        if (title == null) {
-            return "Unknown";
-        }
         return this.title;
     }
 

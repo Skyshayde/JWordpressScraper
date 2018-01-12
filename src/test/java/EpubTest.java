@@ -1,5 +1,8 @@
+import com.google.gson.Gson;
 import io.github.skyshayde.EpubBuilder;
+import io.github.skyshayde.EpubLoader;
 import io.github.skyshayde.WordpressScraper;
+import io.github.skyshayde.Blog;
 
 /**
  * Created by skysh on 12/30/2017.
@@ -8,7 +11,10 @@ import io.github.skyshayde.WordpressScraper;
 class EpubTest {
     public static void main(String[] args) {
         // A wordpress serial I read, using it to test.
+//        EpubLoader e = new EpubLoader("A Practical Guide to Evil - Erraticerrata.epub");
+//        return;
         WordpressScraper scraper = new WordpressScraper("https://practicalguidetoevil.wordpress.com/2015/03/25/prologue/");
-        new EpubBuilder(scraper).build();
+        scraper.scrape();
+        new EpubBuilder(scraper.blog);
     }
 }

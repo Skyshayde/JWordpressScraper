@@ -5,8 +5,8 @@ class Post {
     final String title;
     final String content;
 
-    public Post(String iTitle, String iContent) {
-        this.title = iTitle;
-        this.content = iContent;
+    public Post(String inTitle, String inContent) {
+        this.title = inTitle;
+        this.content = inContent;
     }
 }
