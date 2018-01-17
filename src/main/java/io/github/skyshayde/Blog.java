@@ -15,9 +15,8 @@ public class Blog {
     public void addPost(Post p) {
         posts.forEach(i -> {
             // add underscore if the title is a duplicate and then call the function again
-            if (i.title == p.title) {
-                addPost(new Post(p.title + "_", p.content));
-                return;
+            if (i.title.equals(p.title)) {
+                p.title = p.title + "_";
             }
         });
         posts.add(p);

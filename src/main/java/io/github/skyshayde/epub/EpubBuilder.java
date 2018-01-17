@@ -1,6 +1,7 @@
-package io.github.skyshayde;
+package io.github.skyshayde.epub;
 
 import com.google.gson.Gson;
+import io.github.skyshayde.Blog;
 import nl.siegmann.epublib.domain.*;
 import nl.siegmann.epublib.epub.EpubWriter;
 import org.w3c.dom.Document;

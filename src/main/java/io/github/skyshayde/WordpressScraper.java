@@ -11,57 +11,53 @@ import java.io.IOException;
  */
 
 public class WordpressScraper {
-    private final String firstUrl;
     private String nextUrl;
-    private String prevUrl = "";
 
     private int delay = 0;
-    public final Blog blog = new Blog();
+    public Blog blog;
 
     public WordpressScraper(String url) {
-        this.firstUrl = url;
+        blog = new Blog();
         blog.firstUrl = url;
     }
 
+    public WordpressScraper(Blog blog) {
+        this.blog = blog;
+    }
+
     public WordpressScraper(String url, int delayInMs) {
-        this.firstUrl = url;
         blog.firstUrl = url;
         this.delay = delayInMs;
     }
 
     /**
-     * Calls fetchMeta function with the URL passed when creating the object
+     * Calls scrape(String) function with the URL passed when creating the object
      */
     public WordpressScraper scrape() {
-        Document doc;
-        try {
-            doc = Jsoup.connect(firstUrl).get();
-        } catch (IOException e) {
-            System.out.println("Could not connect to " + firstUrl);
-            return this;
-        }
-        fetchMeta(doc);
-        while (true) {
-            if (nextUrl.equals(prevUrl)) {
-                break;
-            }
+        scrape(blog.firstUrl);
+        return this;
+    }
+
+    /**
+     * @param startUrl URL to start scraping at
+     * @return the instance that the method belongs to
+     */
+    public WordpressScraper scrape(String startUrl) {
+        if (blog.title.equals("Unknown") || blog.author.equals("Unknown")) {
             try {
-                fetchChapter(Jsoup.connect(nextUrl).get());
+                fetchMeta(Jsoup.connect(startUrl).get());
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        return this;
-    }
-
-    public WordpressScraper scrape(String startUrl) {
         nextUrl = startUrl;
         while (true) {
-            if (nextUrl.equals(prevUrl)) {
+            // If nextUrl is equal to PrevUrl, we have reached the end of the blog
+            if (nextUrl.equals(blog.prevUrl)) {
                 break;
             }
             try {
-                fetchChapter(Jsoup.connect(nextUrl).get());
+                blog.addPost(fetchChapter(Jsoup.connect(nextUrl).get()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -72,14 +68,14 @@ public class WordpressScraper {
     public String getNextUrl(Document doc) {
         Element first = doc.selectFirst("link[rel=next]");
         if (first == null) {
-            return null;
+            return blog.prevUrl;
         }
         return first.attr("href");
     }
 
     public String checkIfNewUrl() {
         try {
-            String next = getNextUrl(Jsoup.connect(prevUrl).get());
+            String next = getNextUrl(Jsoup.connect(blog.prevUrl).get());
             return next;
         } catch (IOException e) {
             e.printStackTrace();
@@ -100,18 +96,16 @@ public class WordpressScraper {
         String author = doc.selectFirst("span.author").text();
         blog.setAuthor((author != null) ? (author) : ("Unknown"));
 
-        fetchChapter(doc);
-        this.nextUrl = doc.selectFirst("link[rel=next]").attr("href");
+        nextUrl = getNextUrl(doc);
 
     }
 
-    private void fetchChapter(Document doc) {
+    private Post fetchChapter(Document doc) {
         try {
             Thread.sleep(delay);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        prevUrl = nextUrl;
         blog.prevUrl = nextUrl;
         Element title = doc.selectFirst("h1.entry-title");
         System.out.println(title.text());
@@ -119,12 +113,8 @@ public class WordpressScraper {
         doc.select("div.sharedaddy").remove();
         doc.select("div#jp-post-flair").remove();
         String chapterContent = title.outerHtml() + doc.select("div.entry-content").first().outerHtml();
-        blog.addPost(new Post(title.text(), chapterContent));
-        Element first = doc.selectFirst("link[rel=next]");
-        if (first == null) {
-            return;
-        }
-//        nextUrl = first.attr("href");
+        nextUrl = getNextUrl(doc);
+        return new Post(title.text(), chapterContent);
     }
 
 }

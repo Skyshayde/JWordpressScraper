@@ -1,24 +1,34 @@
-package io.github.skyshayde;
+package io.github.skyshayde.epub;
 
 import com.google.gson.Gson;
-import nl.siegmann.epublib.domain.*;
+import io.github.skyshayde.Blog;
+import io.github.skyshayde.Post;
+import io.github.skyshayde.WordpressScraper;
+import nl.siegmann.epublib.domain.Book;
+import nl.siegmann.epublib.domain.Metadata;
+import nl.siegmann.epublib.domain.TOCReference;
 import nl.siegmann.epublib.epub.EpubReader;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import javax.xml.namespace.QName;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class EpubLoader {
-    public Blog blog = new Blog();
+public class Epub {
+    public WordpressScraper wp;
+    public Blog blog;
 
-    public EpubLoader(String path) {
+    public Epub(String path) {
+        this.blog = blogFromEpub(path);
+        wp = new WordpressScraper(blog);
+    }
+
+    public Blog blogFromEpub(String path) {
+        Blog blog = new Blog();
         EpubReader epubReader = new EpubReader();
         Book book = null;
         try {
@@ -42,25 +52,31 @@ public class EpubLoader {
         list.forEach(i -> {
             try {
                 Reader reader = i.getResource().getReader();
-                int intValueOfChar;
-                String contents = "";
-                while ((intValueOfChar = reader.read()) != -1) {
-                    contents += (char) intValueOfChar;
-                }
+                String contents = readerToString(reader);
                 blog.addPost(getPostFromString(contents));
-                reader.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
-        return;
+        return blog;
     }
 
-    public Post getPostFromString(String s) {
+    private Post getPostFromString(String s) {
         Document doc = Jsoup.parse(s);
         Elements e = doc.getAllElements();
         String title = e.get(0).outerHtml();
         String author = e.get(1).outerHtml();
         return new Post(title, author);
+    }
+
+    public String readerToString(Reader reader) throws IOException {
+        char[] arr = new char[8 * 1024];
+        StringBuilder buffer = new StringBuilder();
+        int numCharsRead;
+        while ((numCharsRead = reader.read(arr, 0, arr.length)) != -1) {
+            buffer.append(arr, 0, numCharsRead);
+        }
+        reader.close();
+        return buffer.toString();
     }
 }

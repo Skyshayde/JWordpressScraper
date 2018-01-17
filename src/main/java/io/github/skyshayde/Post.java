@@ -1,9 +1,9 @@
 package io.github.skyshayde;
 
-class Post {
+public class Post {
 
-    final String title;
-    final String content;
+    public String title;
+    public final String content;
 
     public Post(String inTitle, String inContent) {
         this.title = inTitle;
