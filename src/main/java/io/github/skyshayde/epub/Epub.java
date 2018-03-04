@@ -3,7 +3,7 @@ package io.github.skyshayde.epub;
 import com.google.gson.Gson;
 import io.github.skyshayde.Blog;
 import io.github.skyshayde.Post;
-import io.github.skyshayde.WordpressScraper;
+import io.github.skyshayde.RemoteBlog;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Metadata;
 import nl.siegmann.epublib.domain.TOCReference;
@@ -19,12 +19,12 @@ import java.util.List;
 import java.util.Map;
 
 public class Epub {
-    public WordpressScraper wp;
+    public RemoteBlog wp;
     public Blog blog;
 
     public Epub(String path) {
         this.blog = blogFromEpub(path);
-        wp = new WordpressScraper(blog);
+        wp = new RemoteBlog(blog);
     }
 
     public Blog blogFromEpub(String path) {
